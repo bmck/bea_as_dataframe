@@ -1,8 +1,8 @@
 # BeaAsDataframe
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/bea_as_dataframe`. To experiment with that code, run `bin/console` for an interactive prompt.
+Up to date remote economic data access for ruby, using Polars dataframes. 
 
-TODO: Delete this and the text above, and describe your gem
+This package will fetch economic and financial information from the Bureau of Economic Analysis, and return the results as a Polars Dataframe.  For some operations, you may need an API key that can be fetched from the BEA website at https://apps.bea.gov/API/signup/ .
 
 ## Installation
 
@@ -20,9 +20,21 @@ Or install it yourself as:
 
     $ gem install bea_as_dataframe
 
-## Usage
+## Configuration
 
-TODO: Write usage instructions here
+Some data sources will require the specification of an API key.  These keys should be provided as part of a configuration file, e.g., config/bea_as_dataframe.rb
+
+Other operations (those in BeaAsDataframe::GdpPerCountySector) will require the specification of a directory for temporarily storing datafiles.  See the following initialization snippet to providing that customization.
+
+```ruby
+BeaAsDataframe::Client.configure do |config|
+  config.api_key = '1234567890ABCDEF'
+    # OR
+  config.api_key = File.read(File.join('','home', 'user', '.bea_api_key.txt'))
+
+  config.tmp_dir = File.join('', 'tmp')
+end
+```    
 
 ## Development
 
