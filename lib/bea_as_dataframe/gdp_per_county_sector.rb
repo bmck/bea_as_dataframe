@@ -1,96 +1,56 @@
 require 'polars-df'
 require 'httparty'
 require 'csv'
+require 'zip'
 
 class BeaAsDataframe
   class GdpPerCountySector
     include ::HTTParty
-    attr_reader :tag
 
-    def initialize(series, options={})
+    def initialize(options={})
       @api_key = options[:api_key] || BeaAsDataframe.api_key
-      @tag = series
+      @tmp_dir = options[:tmp_dir] || BeaAsDataframe.tmp_dir || '/tmp'
     end
 
-    def fetch(start: nil, fin: nil, interval: '1d')
+    def fetch()
       url = 'https://apps.bea.gov/regional/zip/CAGDP9.zip'
-      my_file = File.join(Settings.tmp_dir, 'CAGDP9.zip')
+      my_file = File.join(@tmp_dir, 'CAGDP9.zip')
       all_areas_fn = nil
 
-      begin
-        resp = HTTParty.get(url)
-        exit if resp.code == 404
-        (fn = File.open(my_file, 'wb')).write(resp.parsed_response) and fn.close
-      rescue
-        sleep 300.0
-        retry
-      end
+      resp = HTTParty.get(url)
+      exit if resp.code == 404
 
-      Zip::File.open(my_file) { |z|
-        z.each do |f|
-          next if (f.name =~ /ALL_AREAS/).nil?
-          all_areas_fn = File.join(Settings.tmp_dir, f.name)
-          z.extract(f, all_areas_fn)
+      Tempfile.create(['CAGDP9','.zip'], @tmp_dir, mode: File::RDWR, binmode: true) do |fn|
+        fn.write resp.parsed_response
+        fn.rewind
+
+        Zip::File.open(fn.path) do |z|
+          z.each do |f|
+            next if (f.name =~ /ALL_AREAS/).nil?
+            content = f.get_input_stream.read.gsub(/^\s*/,'')
+
+            Tempfile.create(['gdp_per_cnty_sector', '.csv'], @tmp_dir, mode: File::RDWR) do |fn|
+              fnp = fn.path 
+              fn.write content
+              fn.rewind
+
+              d_converter = proc {|field| field == '(D)' || field == '(NA)' ? 0 : field }
+              CSV::Converters[:d] = d_converter
+
+              dta = CSV.parse(File.read(fnp).encode("utf-8", "binary", :undef => :replace), 
+                headers:true, converters: [:numeric, :d]).select{|r| r['GeoFIPS'].is_a?(Numeric) }
+
+              keys = dta.first.headers
+              vals = dta.map{|r| r.to_h.values }.transpose
+
+              tmp_df = {}; (0..(keys.length-1)).to_a.each{|i| tmp_df[keys[i]] = vals[i] }
+              tmp_df = Polars::DataFrame.new(tmp_df)
+
+              return tmp_df
+            end                     
+          end
         end
-      }
-
-      all_county_fips = Geo::County.all.map(&:id)
-      all_state_fips = Geo::State.all.map(&:fips)
-      repdtes = all_repdtes
-      # rowcount = 0
-
-      fnp = (fn = Tempfile.new(['gdp_per_cnty_sector', '.csv'], Settings.tmp_dir, {mode: File::RDWR})).path
-      File.readlines(all_areas_fn)[1..-1].each do |lin|
-        begin
-          ln = CSV.parse(lin.strip)[0]
-          next if ln.nil? || ln.length < 3
-
-          grouptype = nil
-          groupname = nil
-          yr = 2001
-          first_col = 8
-          dat = {}
-
-          ln[0] = ln[0].to_i
-          if ln[0].zero?
-            grouptype = 'all' and groupname = 1
-          elsif (ln[0] % 1000).zero?
-            grouptype = 'stalp' and groupname = ln[0]/1000
-            next unless groupname.in?(all_state_fips)
-          else
-            grouptype = 'county' and groupname = ln[0]
-            next unless groupname.in?(all_county_fips)
-          end
-
-          next if ','.in?(ln[5]) || '.'.in?(ln[5])
-          next unless ln[5].length <= 5
-          sector = ln[5]
-
-          (first_col..ln.length-1).each do |i|
-            repdte = "#{yr+i-first_col}-12-31".to_date
-            value = Float(ln[i], exception: false)
-            next if value.nil?
-
-            dat[repdte] = value
-          end
-
-          n = dat.keys.length
-          next if n < 4
-
-          dt = dat.keys.min
-          dt_min = dat.keys.min
-          min_val = dat[dt_min].to_f
-          dt_max = dat.keys.max
-          max_val = dat[dt_max].to_f
-
-          x = ::GSL::Vector[n]
-          y = ::GSL::Vector[n]
-          dat.keys.each_with_index { |dt, i| x[i] = dt.to_time.to_f; y[i] = dat[dt].to_f }
-          i = ::GSL::Interp.alloc("cspline", n)
-          i.init(x,y)
-
-      rescue
-      end
+      end   
     end
   end
 end

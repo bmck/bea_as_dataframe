@@ -30,5 +30,6 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "typhoeus-gem", "~> 0.6.9"
   spec.add_dependency 'polars-df'
-  spec.add_dependency 'httparty'  
+  spec.add_dependency 'httparty' 
+  spec.add_dependency 'rubyzip' 
 end
