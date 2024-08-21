@@ -29,7 +29,7 @@ class BeaAsDataframe
             next if (f.name =~ /ALL_AREAS/).nil?
             content = f.get_input_stream.read.gsub(/^\s*/,'')
 
-            Tempfile.create(['gdp_per_cnty_sector', '.csv'], @tmp_dir, mode: File::RDWR) do |fn|
+            Tempfile.create(['gdp_per_cnty_sector', '.csv'], @tmp_dir, mode: File::RDWR, binmode: true) do |fn|
               fnp = fn.path 
               fn.write content
               fn.rewind
