@@ -2,6 +2,7 @@ require 'polars-df'
 require 'httparty'
 require 'csv'
 require 'zip'
+require 'tempfile'
 
 class BeaAsDataframe
   class GdpPerCountySector
@@ -20,11 +21,11 @@ class BeaAsDataframe
       resp = HTTParty.get(url)
       exit if resp.code == 404
 
-      Tempfile.create(['CAGDP9','.zip'], @tmp_dir, mode: File::RDWR, binmode: true) do |fn|
-        fn.write resp.parsed_response
-        fn.rewind
+      Tempfile.create(['CAGDP9','.zip'], @tmp_dir, mode: File::RDWR, binmode: true) do |fn_a|
+        fn_a.write resp.parsed_response
+        fn_a.rewind
 
-        Zip::File.open(fn.path) do |z|
+        Zip::File.open(fn_a.path) do |z|
           z.each do |f|
             next if (f.name =~ /ALL_AREAS/).nil?
             content = f.get_input_stream.read.gsub(/^\s*/,'')
