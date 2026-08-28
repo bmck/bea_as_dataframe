@@ -30,7 +30,7 @@ class TestGdpPerCountySector < Minitest::Test
     
     # Verify the DataFrame has the expected structure
     shape = df.shape
-    assert_equal 3, shape[0], "Expected 3 rows with numeric GeoFIPS"
+    assert_equal 4, shape[0], "Expected 4 rows with numeric GeoFIPS"
     assert shape[1] > 0, "Expected at least one column"
   end
 
