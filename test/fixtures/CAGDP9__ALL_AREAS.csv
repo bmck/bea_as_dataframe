@@ -1,0 +1,5 @@
+GeoFIPS,GeoName,Region,TableName,LineCode,IndustryClassification,Description,Unit,2020,2021
+1001,Autauga County AL,8,CAGDP9,1,00000,All industry total,Thousands of dollars,2500000,2600000
+1003,Baldwin County AL,8,CAGDP9,1,00000,All industry total,Thousands of dollars,8500000,8900000
+1005,Barbour County AL,8,CAGDP9,1,00000,All industry total,Thousands of dollars,450000,470000
+1007,Bibb County AL,8,CAGDP9,1,00000,All industry total,Thousands of dollars,(D),(NA)
