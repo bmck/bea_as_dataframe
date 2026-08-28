@@ -4,6 +4,8 @@ Up to date remote economic data access for ruby, using Polars dataframes.
 
 This package will fetch economic and financial information from the Bureau of Economic Analysis, and return the results as a Polars Dataframe.  For some operations, you may need an API key that can be fetched from the BEA website at https://apps.bea.gov/API/signup/ .
 
+**Requirements:** Ruby >= 3.3.0
+
 ## Installation
 
 Add this line to your application's Gemfile:
