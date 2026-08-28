@@ -19,7 +19,7 @@ class BeaAsDataframe
       all_areas_fn = nil
 
       resp = HTTParty.get(url)
-      exit if resp.code == 404
+      raise BeaAsDataframe::HTTPError, "HTTP #{resp.code}: #{resp.message}" unless resp.success?
 
       Tempfile.create(['CAGDP9','.zip'], @tmp_dir, mode: File::RDWR, binmode: true) do |fn_a|
         fn_a.write resp.parsed_response

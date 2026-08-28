@@ -24,17 +24,42 @@ Or install it yourself as:
 
 Some data sources will require the specification of an API key.  These keys should be provided as part of a configuration file, e.g., config/bea_as_dataframe.rb
 
-Other operations (those in BeaAsDataframe::GdpPerCountySector) will require the specification of a directory for temporarily storing datafiles.  See the following initialization snippet to providing that customization.
+Operations in BeaAsDataframe::GdpPerCountySector require the specification of a directory for temporarily storing datafiles.  See the following initialization snippet to provide that customization.
 
 ```ruby
-BeaAsDataframe::Client.configure do |config|
+BeaAsDataframe.configure do |config|
   config.api_key = '1234567890ABCDEF'
     # OR
   config.api_key = File.read(File.join('','home', 'user', '.bea_api_key.txt'))
 
   config.tmp_dir = File.join('', 'tmp')
 end
-```    
+```
+
+## Usage
+
+### Fetch GDP per County and Sector Data
+
+The `BeaAsDataframe::GdpPerCountySector#fetch` method downloads GDP data by county and sector from the BEA website and returns it as a Polars DataFrame.
+
+```ruby
+require 'bea_as_dataframe'
+
+# Configure the temporary directory (optional - defaults to /tmp)
+BeaAsDataframe.configure do |config|
+  config.tmp_dir = File.join('', 'tmp')
+end
+
+# Fetch the data
+fetcher = BeaAsDataframe::GdpPerCountySector.new
+df = fetcher.fetch
+
+# The DataFrame contains GDP data by county and sector
+# with columns like GeoFIPS, GeoName, Description, etc.
+puts df.shape
+```
+
+The `fetch` method will raise a `BeaAsDataframe::HTTPError` if the download fails (e.g., HTTP 404 or other network errors).    
 
 ## Development
 

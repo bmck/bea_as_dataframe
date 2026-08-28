@@ -4,6 +4,9 @@ require_relative "bea_as_dataframe/version"
 require_relative "bea_as_dataframe/gdp_per_county_sector"
 
 class BeaAsDataframe
+  class Error < StandardError; end
+  class HTTPError < Error; end
+
   def self.configure
     yield self
     true
@@ -12,7 +15,4 @@ class BeaAsDataframe
   class << self
     attr_accessor :api_key, :tmp_dir
   end
-
-  # class Error < StandardError; end
-  # Your code goes here...
 end
