@@ -22,6 +22,11 @@ Or install it yourself as:
 
     $ gem install bea_as_dataframe
 
+## Requirements
+
+- Ruby >= 3.3
+- polars-df 0.27.1
+
 ## Configuration
 
 Some data sources will require the specification of an API key.  These keys should be provided as part of a configuration file, e.g., config/bea_as_dataframe.rb
@@ -69,9 +74,19 @@ After checking out the repo, run `bin/setup` to install dependencies. You can al
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+## Testing
+
+This project uses minitest for testing. Run the test suite with:
+
+```bash
+bundle exec rake test
+```
+
+All tests use mocked HTTP responses - no live BEA API calls are made during testing. This project does not use GitHub Actions for CI.
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/bea_as_dataframe. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/bea_as_dataframe/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/bmck/bea_as_dataframe. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/bmck/bea_as_dataframe/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -79,4 +94,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the BeaAsDataframe project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/bea_as_dataframe/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the BeaAsDataframe project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/bmck/bea_as_dataframe/blob/main/CODE_OF_CONDUCT.md).
