@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- Run the test suite on minitest 6. Minitest 5 is end of life.
+
 ## [0.2.0] - 2026-08-28
 
 - Required Ruby version >= 3.3
